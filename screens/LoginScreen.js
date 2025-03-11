@@ -11,13 +11,12 @@ const LoginScreen = ({ setIsAuthenticated }) => {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleLogin = async () => {
-    // Validation des champs
+
     if (!email || !password) {
       Alert.alert('Erreur', 'Veuillez remplir tous les champs');
       return;
     }
 
-    // Validation basique de l'email
     if (!/\S+@\S+\.\S+/.test(email)) {
       Alert.alert('Erreur', 'Veuillez entrer une adresse email valide');
       return;
@@ -31,7 +30,7 @@ const LoginScreen = ({ setIsAuthenticated }) => {
         password
       });
 
-      // Stockage du token et mise à jour de l'état d'authentification
+
       await AsyncStorage.setItem('token', response.data.token);
       setIsAuthenticated(true);
       

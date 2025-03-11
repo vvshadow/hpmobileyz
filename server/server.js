@@ -21,7 +21,7 @@ app.use(express.json());
 const pool = mysql.createPool({
   host: process.env.DB_HOST || 'localhost',
   user: process.env.DB_USER || 'root',
-  password: process.env.DB_PASSWORD || '2019HSQL?',
+  password: process.env.DB_PASSWORD || 'newpass',
   database: process.env.DB_NAME || 'hopitalsej',
   waitForConnections: true,
   connectionLimit: 10,
@@ -80,11 +80,11 @@ app.post('/login', async (req, res) => {
       },
 
       JWT_SECRET,
-      { expiresIn: '1h' }
+      { expiresIn: '30m' }
     );
 
     res.json({ token });
-
+    
   } catch (error) {
 
     console.error('Login error:', error);
