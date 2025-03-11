@@ -84,7 +84,7 @@ app.post('/login', async (req, res) => {
     );
 
     res.json({ token });
-    
+
   } catch (error) {
 
     console.error('Login error:', error);
@@ -109,9 +109,6 @@ app.get('/profile', authenticateToken, async (req, res) => {
     res.status(500).json({ error: 'Erreur serveur' });
   }
 });
-
-
-
 
 app.listen(port, () => {
   console.log(`Serveur en écoute sur http://localhost:${port}`);
