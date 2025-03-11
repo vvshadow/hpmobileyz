@@ -9,9 +9,9 @@ const app = express();
 const port = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || 'secret_key_secure';
 
-// Configuration CORS
+
 app.use(cors({
-  origin: '*', // À restreindre en production
+  origin: '*', 
   methods: ['GET', 'POST'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
@@ -42,7 +42,7 @@ const authenticateToken = (req, res, next) => {
   });
 };
 
-// api login
+
 app.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -72,13 +72,13 @@ app.post('/login', async (req, res) => {
       return res.status(403).json({ error: 'Compte non vérifié' });
     }
 
-    // creat jwt à test 
     const token = jwt.sign(
       { 
         id: user.id,
         email: user.email,
         roles: user.roles 
       },
+
       JWT_SECRET,
       { expiresIn: '1h' }
     );
@@ -86,8 +86,10 @@ app.post('/login', async (req, res) => {
     res.json({ token });
 
   } catch (error) {
+
     console.error('Login error:', error);
     res.status(500).json({ error: 'Erreur serveur' });
+    
   }
 });
 
