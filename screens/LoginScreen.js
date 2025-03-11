@@ -3,7 +3,7 @@ import { View, Text, TextInput, Button, Alert, StyleSheet, ActivityIndicator } f
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const API_URL = 'http://192.168.1.117:3000'; // Remplacer par votre IP locale
+const API_URL = 'http://192.168.1.117:3000'; 
 
 const LoginScreen = ({ setIsAuthenticated }) => {
   const [email, setEmail] = useState('');
@@ -39,7 +39,7 @@ const LoginScreen = ({ setIsAuthenticated }) => {
       let errorMessage = 'Erreur de connexion';
       
       if (error.response) {
-        // Gestion des erreurs spécifiques du serveur
+        
         switch (error.response.status) {
           case 400:
             errorMessage = 'Données invalides';
