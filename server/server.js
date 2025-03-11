@@ -9,7 +9,6 @@ const app = express();
 const port = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || 'secret_key_secure';
 
-
 app.use(cors({
   origin: '*', 
   methods: ['GET', 'POST'],
@@ -61,8 +60,7 @@ app.post('/login', async (req, res) => {
     }
 
     const user = users[0];
-    
-  
+
     const validPassword = await bcrypt.compare(password, user.password);
     if (!validPassword) {
       return res.status(401).json({ error: 'Identifiants invalides' });
