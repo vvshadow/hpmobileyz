@@ -7,7 +7,7 @@ require('dotenv').config();
 
 const app = express();
 const port = process.env.PORT || 3000;
-const JWT_SECRET = process.env.JWT_SECRET || 'secret_key_secure';
+const JWT_SECRET = process.env.JWT_SECRET || 'Zaydtes';
 
 
 app.use(cors({
@@ -21,7 +21,7 @@ app.use(express.json());
 const pool = mysql.createPool({
   host: process.env.DB_HOST || 'localhost',
   user: process.env.DB_USER || 'root',
-  password: process.env.DB_PASSWORD || 'newpass',
+  password: process.env.DB_PASSWORD || '2019HSQL?',
   database: process.env.DB_NAME || 'hopitalsej',
   waitForConnections: true,
   connectionLimit: 10,
