@@ -24,11 +24,14 @@ const App = () => {
 
   return (
     <NavigationContainer>
-      <Stack.Navigator>
+      <Stack.Navigator
+      screenOptions={{
+        headerShown: false 
+      }}>
         {isAuthenticated ? (
           <Stack.Screen name="Profile" component={ProfileScreen} />
         ) : (
-          <Stack.Screen name="Login">
+          <Stack.Screen name="Login" >
             {(props) => <LoginScreen {...props} setIsAuthenticated={setIsAuthenticated} />}
           </Stack.Screen>
         )}

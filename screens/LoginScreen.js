@@ -1,123 +1,260 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, Button, Alert, StyleSheet, ActivityIndicator } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { 
+  View, 
+  Text, 
+  TextInput, 
+  TouchableOpacity, 
+  Alert, 
+  StyleSheet, 
+  ActivityIndicator, 
+  Image,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView
+} from 'react-native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
-const API_URL = 'http://192.168.1.22:3000'; 
+const API_URL = 'http://192.168.1.117:8000/api';
 
-const LoginScreen = ({ setIsAuthenticated }) => {
+const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
+  const [errors, setErrors] = useState({});
+
+  useEffect(() => {
+    const loadSavedCredentials = async () => {
+      const savedEmail = await AsyncStorage.getItem('email');
+      const savedPassword = await AsyncStorage.getItem('password');
+      if (savedEmail && savedPassword) {
+        setEmail(savedEmail);
+        setPassword(savedPassword);
+        setRememberMe(true);
+      }
+    };
+    loadSavedCredentials();
+  }, []);
+
+  const validateForm = () => {
+    let newErrors = {};
+    if (!email) newErrors.email = 'Email requis';
+    else if (!/\S+@\S+\.\S+/.test(email)) newErrors.email = 'Email invalide';
+    if (!password) newErrors.password = 'Mot de passe requis';
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleLogin = async () => {
-
-    if (!email || !password) {
-      Alert.alert('Erreur', 'Veuillez remplir tous les champs');
-      return;
-    }
-
-    if (!/\S+@\S+\.\S+/.test(email)) {
-      Alert.alert('Erreur', 'Veuillez entrer une adresse email valide');
-      return;
-    }
+    if (!validateForm()) return;
 
     setIsLoading(true);
-    
-    try {
-      const response = await axios.post(`${API_URL}/login`, {
-        email,
-        password
-      });
 
+    try {
+      const response = await axios.post(
+        `${API_URL}/login_check`,
+        { username: email, password },
+        { headers: { 'Content-Type': 'application/json' } }
+      );
 
       await AsyncStorage.setItem('token', response.data.token);
-      setIsAuthenticated(true);
-      
-    } catch (error) {
-      let errorMessage = 'Erreur de connexion';
-      
-      if (error.response) {
-        
-        switch (error.response.status) {
-          case 400:
-            errorMessage = 'Données invalides';
-            break;
-          case 401:
-            errorMessage = 'Identifiants incorrects';
-            break;
-          case 403:
-            errorMessage = 'Compte non vérifié';
-            break;
-          case 500:
-            errorMessage = 'Erreur serveur';
-            break;
-          default:
-            errorMessage = error.response.data.error || errorMessage;
-        }
-      } else if (error.request) {
-        errorMessage = 'Le serveur ne répond pas';
+      if (rememberMe) {
+        await AsyncStorage.multiSet([['email', email], ['password', password]]);
+      } else {
+        await AsyncStorage.multiRemove(['email', 'password']);
       }
-      
-      Alert.alert('Erreur', errorMessage);
+
+      navigation.navigate('ProfileScreen');
+    } catch (error) {
+      let message = error.response?.data?.message || 'Erreur de connexion';
+      if (error.response?.status === 401) message = 'Identifiants incorrects';
+      Alert.alert('Erreur', message);
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Connexion</Text>
-      
-      <TextInput
-        placeholder="Adresse email"
-        value={email}
-        onChangeText={setEmail}
-        style={styles.input}
-        autoCapitalize="none"
-        keyboardType="email-address"
-      />
-      
-      <TextInput
-        placeholder="Mot de passe"
-        value={password}
-        secureTextEntry
-        onChangeText={setPassword}
-        style={styles.input}
-      />
-      
-      {isLoading ? (
-        <ActivityIndicator size="large" color="#0000ff" />
-      ) : (
-        <Button 
-          title="Se connecter" 
-          onPress={handleLogin} 
-          disabled={isLoading}
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={styles.container}
+    >
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <Image
+          source={require('../assets/logo-png.png')} // Ajoutez votre propre logo
+          style={[styles.logo, { borderRadius: 20 }]}
         />
-      )}
-    </View>
+        
+        <Text style={styles.title}>Connexion</Text>
+
+        <View style={styles.inputContainer}>
+          <MaterialIcons name="email" size={20} color="#666" style={styles.icon} />
+          <TextInput
+            placeholder="Adresse email"
+            value={email}
+            onChangeText={setEmail}
+            style={styles.input}
+            autoCapitalize="none"
+            keyboardType="email-address"
+            placeholderTextColor="#999"
+          />
+        </View>
+        {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
+
+        <View style={styles.inputContainer}>
+          <MaterialIcons name="lock" size={20} color="#666" style={styles.icon} />
+          <TextInput
+            placeholder="Mot de passe"
+            value={password}
+            secureTextEntry={!showPassword}
+            onChangeText={setPassword}
+            style={styles.input}
+            placeholderTextColor="#999"
+          />
+          <TouchableOpacity 
+            onPress={() => setShowPassword(!showPassword)}
+            style={styles.eyeIcon}
+          >
+            <MaterialIcons 
+              name={showPassword ? 'visibility-off' : 'visibility'} 
+              size={20} 
+              color="#666" 
+            />
+          </TouchableOpacity>
+        </View>
+        {errors.password && <Text style={styles.errorText}>{errors.password}</Text>}
+
+        <View style={styles.rememberMeContainer}>
+          <TouchableOpacity onPress={() => setRememberMe(!rememberMe)}>
+            <MaterialIcons 
+              name={rememberMe ? 'check-box' : 'check-box-outline-blank'} 
+              size={24} 
+              color={rememberMe ? '#1E90FF' : '#666'} 
+            />
+          </TouchableOpacity>
+          <Text style={styles.rememberMeText}>Se souvenir de moi</Text>
+        </View>
+
+        <TouchableOpacity 
+          style={[styles.loginButton, isLoading && styles.disabledButton]}
+          onPress={handleLogin}
+          disabled={isLoading}
+        >
+          {isLoading ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Text style={styles.buttonText}>Se connecter</Text>
+          )}
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={() => navigation.navigate('ForgotPassword')}
+        >
+          <Text style={styles.linkText}>Mot de passe oublié ?</Text>
+        </TouchableOpacity>
+
+        <View style={styles.signupContainer}>
+          <Text style={styles.signupText}>Pas de compte ? </Text>
+          <TouchableOpacity onPress={() => navigation.navigate('Register')}>
+            <Text style={styles.signupLink}>S'inscrire</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#fff',
+  },
+  scrollContainer: {
+    flexGrow: 1,
     justifyContent: 'center',
-    padding: 20,
+    padding: 30,
+  },
+  logo: {
+    width: 150,
+    height: 150,
+    alignSelf: 'center',
+    marginBottom: 30,
   },
   title: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: 'bold',
-    marginBottom: 20,
+    color: '#333',
+    marginBottom: 40,
     textAlign: 'center',
   },
-  input: {
-    height: 40,
-    borderColor: 'gray',
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
     borderWidth: 1,
-    marginBottom: 20,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    marginBottom: 10,
     paddingHorizontal: 10,
-    borderRadius: 5,
+  },
+  icon: {
+    marginRight: 10,
+  },
+  input: {
+    flex: 1,
+    height: 50,
+    color: '#333',
+  },
+  eyeIcon: {
+    padding: 10,
+  },
+  errorText: {
+    color: 'red',
+    fontSize: 12,
+    marginBottom: 15,
+  },
+  rememberMeContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 15,
+  },
+  rememberMeText: {
+    marginLeft: 8,
+    color: '#666',
+  },
+  loginButton: {
+    backgroundColor: '#1E90FF',
+    padding: 15,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginVertical: 20,
+  },
+  disabledButton: {
+    backgroundColor: '#87CEFA',
+  },
+  buttonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  linkText: {
+    color: '#1E90FF',
+    textAlign: 'center',
+    marginTop: 10,
+  },
+  signupContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: 30,
+  },
+  signupText: {
+    color: '#666',
+  },
+  signupLink: {
+    color: '#1E90FF',
+    fontWeight: 'bold',
   },
 });
 
