@@ -107,7 +107,7 @@ const PatientsListScreen = ({ navigation }) => {
         </Text>
         <View style={styles.detailRow}>
           <Icon name="fingerprint" size={14} color="#666" />
-          <Text style={styles.patientDetail}> {item.patient_id}</Text>
+          <Text style={styles.patientDetail}> {item.id}</Text>
         </View>
         <View style={styles.detailRow}>
           <Icon name="cake" size={14} color="#666" />
