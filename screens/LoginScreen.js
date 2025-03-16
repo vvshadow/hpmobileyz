@@ -18,7 +18,7 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 const API_URL = 'http://192.168.1.117:8000/api';
 
-const LoginScreen = ({ navigation }) => {
+const LoginScreen = ({ navigation, setIsAuthenticated }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -67,7 +67,7 @@ const LoginScreen = ({ navigation }) => {
         await AsyncStorage.multiRemove(['email', 'password']);
       }
 
-      navigation.navigate('ProfileScreen');
+      setIsAuthenticated(true);
     } catch (error) {
       let message = error.response?.data?.message || 'Erreur de connexion';
       if (error.response?.status === 401) message = 'Identifiants incorrects';
@@ -84,7 +84,7 @@ const LoginScreen = ({ navigation }) => {
     >
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <Image
-          source={require('../assets/logo-png.png')} // Ajoutez votre propre logo
+          source={require('../assets/logo-png.png')}
           style={[styles.logo, { borderRadius: 20 }]}
         />
         
