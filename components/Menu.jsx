@@ -28,7 +28,13 @@ const Menu = ({ navigation }) => {
         <Icon name="settings" size={24} color="#333" />
         <Text style={styles.menuText}>Réglages</Text>
       </TouchableOpacity>
-      
+      <TouchableOpacity 
+        style={styles.menuItem}
+        onPress={() => navigation.navigate('Patients')}
+      >
+        <Icon name="supervised-user-circle" size={24} color="#333" />
+        <Text style={styles.menuText}>Patients</Text>
+      </TouchableOpacity>
     </View>
   );
 };
