@@ -2,8 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { TouchableOpacity } from 'react-native';
+import Icon from 'react-native-vector-icons/Ionicons';
+
 import LoginScreen from './screens/LoginScreen';
 import ProfileScreen from './screens/ProfileScreen';
+import PatientsListScreen from './screens/PatientListScreen';
+import PatientViewScreen from './screens/PatientViewScreen';
+import PatientFormScreen from './screens/PatientFormScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -23,14 +29,54 @@ const App = () => {
       <Stack.Navigator
         screenOptions={{
           headerShown: true,
+          headerBackTitleVisible: false,
+          headerTintColor: '#007AFF',
         }}
       >
         {isAuthenticated ? (
-          <Stack.Screen name="Profile">
-            {(props) => <ProfileScreen {...props} setIsAuthenticated={setIsAuthenticated} />}
-          </Stack.Screen>
+          <>
+            <Stack.Screen 
+              name="Patients" 
+              component={PatientsListScreen}
+              options={({ navigation }) => ({ 
+                title: 'Gestion des Patients',
+                headerRight: () => (
+                  <TouchableOpacity
+                    style={{ marginRight: 15 }}
+                    onPress={() => navigation.navigate('Profile')}
+                  >
+                    <Icon name="person" size={24} color="#007AFF" />
+                  </TouchableOpacity>
+                )
+              })}
+            />
+            <Stack.Screen 
+              name="PatientView" 
+              component={PatientViewScreen} 
+              options={{ title: 'Détails Patient' }} 
+            />
+            <Stack.Screen 
+              name="PatientCreate" 
+              component={PatientFormScreen} 
+              options={{ title: 'Nouveau Patient' }} 
+            />
+            <Stack.Screen 
+              name="PatientEdit" 
+              component={PatientFormScreen} 
+              options={{ title: 'Modifier Patient' }} 
+            />
+            <Stack.Screen 
+              name="Profile" 
+              options={{ title: 'Profil Utilisateur' }}
+            >
+              {(props) => <ProfileScreen {...props} setIsAuthenticated={setIsAuthenticated} />}
+            </Stack.Screen>
+          </>
         ) : (
-          <Stack.Screen name="Login">
+          <Stack.Screen 
+            name="Login" 
+            options={{ headerShown: false }}
+          >
             {(props) => <LoginScreen {...props} setIsAuthenticated={setIsAuthenticated} />}
           </Stack.Screen>
         )}
