@@ -7,14 +7,14 @@ import {
   ScrollView, 
   SafeAreaView, 
   TouchableOpacity, 
-  Modal,
-  Image
+  Modal 
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import Menu from '../components/Menu'; // Import du composant Menu
+// Si vous n'avez pas le composant Menu, vous pouvez le commenter ou l'enlever
+import Menu from '../components/Menu';
 
-const ProfileScreen = ({ navigation }) => {
+const ProfileScreen = ({ navigation, setIsAuthenticated }) => {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -23,12 +23,10 @@ const ProfileScreen = ({ navigation }) => {
   const fetchProfile = async () => {
     try {
       const token = await AsyncStorage.getItem('token');
-      
       if (!token) {
-        navigation.replace('Login');
+        setIsAuthenticated(false);
         return;
       }
-
       const response = await fetch('http://192.168.1.117:8000/api/profile', {
         method: 'GET',
         headers: {
@@ -36,20 +34,17 @@ const ProfileScreen = ({ navigation }) => {
           'Content-Type': 'application/json',
         },
       });
-
       const data = await response.json();
-
       if (!response.ok) {
         throw new Error(data.message || 'Erreur lors de la récupération du profil');
       }
-
       setUserData(data);
       setLoading(false);
     } catch (err) {
       setError(err.message);
       setLoading(false);
       await AsyncStorage.removeItem('token');
-      navigation.replace('Login');
+      setIsAuthenticated(false);
     }
   };
 
@@ -59,7 +54,7 @@ const ProfileScreen = ({ navigation }) => {
 
   const handleLogout = async () => {
     await AsyncStorage.removeItem('token');
-    navigation.replace('Login');
+    setIsAuthenticated(false);
   };
 
   if (loading) {
@@ -79,7 +74,7 @@ const ProfileScreen = ({ navigation }) => {
           <Text style={styles.errorText}>{error}</Text>
           <TouchableOpacity
             style={styles.button}
-            onPress={() => navigation.replace('Login')}
+            onPress={() => setIsAuthenticated(false)}
           >
             <Text style={styles.buttonText}>Se reconnecter</Text>
           </TouchableOpacity>
@@ -125,7 +120,8 @@ const ProfileScreen = ({ navigation }) => {
         </TouchableOpacity>
       </ScrollView>
 
-      <Menu navigation={navigation} /> {/* Utilisation du composant Menu */}
+      {/** Si vous n'avez pas de composant Menu, vous pouvez commenter la ligne suivante */}
+      <Menu navigation={navigation} />
 
       <Modal
         animationType="slide"
@@ -137,7 +133,6 @@ const ProfileScreen = ({ navigation }) => {
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Confirmer la déconnexion</Text>
             <Text style={styles.modalText}>Êtes-vous sûr de vouloir vous déconnecter ?</Text>
-            
             <View style={styles.modalButtons}>
               <TouchableOpacity
                 style={[styles.modalButton, styles.cancelButton]}
@@ -145,7 +140,6 @@ const ProfileScreen = ({ navigation }) => {
               >
                 <Text style={styles.cancelButtonText}>Annuler</Text>
               </TouchableOpacity>
-              
               <TouchableOpacity
                 style={[styles.modalButton, styles.confirmButton]}
                 onPress={handleLogout}

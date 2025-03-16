@@ -87,7 +87,6 @@ const LoginScreen = ({ navigation, setIsAuthenticated }) => {
           source={require('../assets/logo-png.png')}
           style={[styles.logo, { borderRadius: 20 }]}
         />
-        
         <Text style={styles.title}>Connexion</Text>
 
         <View style={styles.inputContainer}>
@@ -149,19 +148,6 @@ const LoginScreen = ({ navigation, setIsAuthenticated }) => {
             <Text style={styles.buttonText}>Se connecter</Text>
           )}
         </TouchableOpacity>
-
-        <TouchableOpacity
-          onPress={() => navigation.navigate('ForgotPassword')}
-        >
-          <Text style={styles.linkText}>Mot de passe oublié ?</Text>
-        </TouchableOpacity>
-
-        <View style={styles.signupContainer}>
-          <Text style={styles.signupText}>Pas de compte ? </Text>
-          <TouchableOpacity onPress={() => navigation.navigate('Register')}>
-            <Text style={styles.signupLink}>S'inscrire</Text>
-          </TouchableOpacity>
-        </View>
       </ScrollView>
     </KeyboardAvoidingView>
   );

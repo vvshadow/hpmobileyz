@@ -1,13 +1,9 @@
-// App.js
 import React, { useState, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import LoginScreen from './screens/LoginScreen';
 import ProfileScreen from './screens/ProfileScreen';
-import 'web-streams-polyfill';
-
-
 
 const Stack = createNativeStackNavigator();
 
@@ -25,13 +21,16 @@ const App = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator
-      screenOptions={{
-        headerShown: true
-      }}>
+        screenOptions={{
+          headerShown: true,
+        }}
+      >
         {isAuthenticated ? (
-          <Stack.Screen name="Profile" component={ProfileScreen} />
+          <Stack.Screen name="Profile">
+            {(props) => <ProfileScreen {...props} setIsAuthenticated={setIsAuthenticated} />}
+          </Stack.Screen>
         ) : (
-          <Stack.Screen name="Login" >
+          <Stack.Screen name="Login">
             {(props) => <LoginScreen {...props} setIsAuthenticated={setIsAuthenticated} />}
           </Stack.Screen>
         )}
