@@ -16,9 +16,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { debounce } from 'lodash';
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 
-const PatientsListScreen = ({ navigation }) => {
+const PatientListScreen = ({ navigation }) => {
   const [patients, setPatients] = useState([]);
   const [filteredPatients, setFilteredPatients] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -41,20 +41,16 @@ const PatientsListScreen = ({ navigation }) => {
       if (!response.ok) throw new Error('Erreur de chargement');
 
       const data = await response.json();
-      setPatients(data); // Garde tous les patients dans l'état `patients`
-
-      // Filtrer les patients en fonction de la requête de recherche
-      if (query) {
-        const filtered = data.filter(
-          (patient) =>
-            patient.prenom.toLowerCase().includes(query.toLowerCase()) ||
-            patient.nom.toLowerCase().includes(query.toLowerCase())
-        );
-        setFilteredPatients(filtered);
-      } else {
-        // Si la requête est vide, afficher tous les patients
-        setFilteredPatients(data);
-      }
+      setPatients(data);
+      setFilteredPatients(
+        query
+          ? data.filter(
+              (patient) =>
+                patient.prenom.toLowerCase().includes(query.toLowerCase()) ||
+                patient.nom.toLowerCase().includes(query.toLowerCase())
+            )
+          : data
+      );
     } catch (err) {
       setError(err.message);
     } finally {
@@ -64,15 +60,12 @@ const PatientsListScreen = ({ navigation }) => {
   };
 
   const debouncedSearch = useCallback(
-    debounce((query) => {
-      fetchPatients(query);
-    }, 800),
+    debounce((query) => fetchPatients(query), 800),
     []
   );
 
   useEffect(() => {
     if (searchQuery === '') {
-      // Si le champ est vide, récupérer tous les patients immédiatement
       fetchPatients('');
     } else {
       setSearchLoading(true);
@@ -100,46 +93,57 @@ const PatientsListScreen = ({ navigation }) => {
   };
 
   const renderPatientItem = ({ item }) => (
-    <View style={styles.patientCard} key={item.id}>
+    <View style={styles.patientCard}>
+      <View style={styles.avatar}>
+        <Text style={styles.avatarText}>
+          {item.prenom[0]}
+          {item.nom[0]}
+        </Text>
+      </View>
+
       <View style={styles.patientInfo}>
         <Text style={styles.patientName}>
           {item.prenom} {item.nom}
         </Text>
-        <View style={styles.detailRow}>
-          <Icon name="fingerprint" size={14} color="#666" />
-          <Text style={styles.patientDetail}> {item.id}</Text>
-        </View>
-        <View style={styles.detailRow}>
-          <Icon name="cake" size={14} color="#666" />
-          <Text style={styles.patientDetail}>
-            {new Date(item.dtenaiss).toLocaleDateString()}
-          </Text>
+
+        <View style={styles.detailsContainer}>
+          <View style={styles.detailItem}>
+            <Icon name="fingerprint" size={16} color="#6B7280" />
+            <Text style={styles.detailText}>{item.id}</Text>
+          </View>
+
+          <View style={styles.detailItem}>
+            <Icon name="cake" size={16} color="#6B7280" />
+            <Text style={styles.detailText}>
+              {new Date(item.dtenaiss).toLocaleDateString()}
+            </Text>
+          </View>
         </View>
       </View>
 
       <View style={styles.actions}>
         <TouchableOpacity
+          style={[styles.iconButton, styles.viewButton]}
           onPress={() => navigation.navigate('PatientView', { id: item.id })}
-          style={styles.actionButton}
-        >
-          <Icon name="visibility" size={20} color="#007AFF" />
+          activeOpacity={0.6}>
+          <Icon name="visibility" size={20} color="#FFF" />
         </TouchableOpacity>
 
         <TouchableOpacity
+          style={[styles.iconButton, styles.editButton]}
           onPress={() => navigation.navigate('PatientEdit', { patient: item })}
-          style={styles.actionButton}
-        >
-          <Icon name="edit" size={20} color="#4CAF50" />
+          activeOpacity={0.6}>
+          <Icon name="edit" size={20} color="#FFF" />
         </TouchableOpacity>
 
         <TouchableOpacity
+          style={[styles.iconButton, styles.deleteButton]}
           onPress={() => {
             setSelectedPatient(item.id);
             setDeleteVisible(true);
           }}
-          style={styles.actionButton}
-        >
-          <Icon name="delete" size={20} color="#FF3B30" />
+          activeOpacity={0.7}>
+          <Icon name="delete" size={20} color="#FFF" />
         </TouchableOpacity>
       </View>
     </View>
@@ -147,10 +151,10 @@ const PatientsListScreen = ({ navigation }) => {
 
   if (loading) {
     return (
-      <SafeAreaView style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#007AFF" />
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#4F46E5" />
         <Text style={styles.loadingText}>Chargement des patients...</Text>
-      </SafeAreaView>
+      </View>
     );
   }
 
@@ -160,26 +164,26 @@ const PatientsListScreen = ({ navigation }) => {
         <Text style={styles.title}>Patients</Text>
         <TouchableOpacity
           style={styles.addButton}
-          onPress={() => navigation.navigate('PatientCreate')}
-        >
-          <Icon name="add" size={24} color="#FFF" />
+          onPress={() => navigation.navigate('PatientCreate')}>
+          <Icon name="add" size={28} color="#FFF" />
         </TouchableOpacity>
       </View>
 
       <View style={styles.searchContainer}>
+        <Icon name="search" size={24} color="#9CA3AF" style={styles.searchIcon} />
         <TextInput
           style={styles.searchInput}
           placeholder="Rechercher un patient..."
-          placeholderTextColor="#999"
+          placeholderTextColor="#9CA3AF"
           value={searchQuery}
           onChangeText={setSearchQuery}
         />
-        {searchLoading && <ActivityIndicator style={styles.searchLoader} color="#007AFF" />}
+        {searchLoading && <ActivityIndicator style={styles.searchLoader} color="#6366f1" />}
       </View>
 
       {error && (
         <View style={styles.errorCard}>
-          <Icon name="error" size={24} color="#FF3B30" />
+          <Icon name="error" size={24} color="#EF4444" />
           <Text style={styles.errorText}>{error}</Text>
         </View>
       )}
@@ -191,7 +195,7 @@ const PatientsListScreen = ({ navigation }) => {
         contentContainerStyle={styles.scrollContent}
         ListEmptyComponent={
           <View style={styles.emptyState}>
-            <Icon name="group" size={60} color="#E0E0E0" />
+            <Icon name="people-outline" size={60} color="#CBD5E1" />
             <Text style={styles.emptyText}>Aucun patient trouvé</Text>
           </View>
         }
@@ -201,29 +205,26 @@ const PatientsListScreen = ({ navigation }) => {
         visible={deleteVisible}
         transparent
         animationType="fade"
-        onRequestClose={() => setDeleteVisible(false)}
-      >
+        onRequestClose={() => setDeleteVisible(false)}>
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
-              <Icon name="warning" size={28} color="#FF3B30" />
-              <Text style={styles.modalTitle}>Supprimer patient</Text>
+              <Icon name="warning" size={32} color="#EF4444" />
+              <Text style={styles.modalTitle}>Confirmer la suppression</Text>
             </View>
-            <Text style={styles.modalText}>Cette action est irréversible. Confirmer la suppression ?</Text>
-
+            <Text style={styles.modalText}>
+              Êtes-vous sûr de vouloir supprimer définitivement ce patient ?
+            </Text>
             <View style={styles.modalButtons}>
               <TouchableOpacity
                 style={[styles.modalButton, styles.cancelButton]}
-                onPress={() => setDeleteVisible(false)}
-              >
+                onPress={() => setDeleteVisible(false)}>
                 <Text style={styles.cancelButtonText}>Annuler</Text>
               </TouchableOpacity>
-
               <TouchableOpacity
                 style={[styles.modalButton, styles.confirmButton]}
-                onPress={() => handleDelete(selectedPatient)}
-              >
-                <Text style={styles.confirmButtonText}>Confirmer</Text>
+                onPress={() => handleDelete(selectedPatient)}>
+                <Text style={styles.confirmButtonText}>Supprimer</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -236,180 +237,229 @@ const PatientsListScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F7FB',
-    paddingHorizontal: 20,
+    backgroundColor: '#f8fafc',
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#F5F7FB',
   },
   loadingText: {
-    marginTop: 15,
-    color: '#666',
+    marginTop: 20,
+    color: '#4F46E5',
     fontSize: 16,
+    fontWeight: '500',
   },
   header: {
+    paddingVertical: 24,
+    paddingHorizontal: 20,
+    backgroundColor: '#4f46e5',
+    borderBottomRightRadius: 24,
+    borderBottomLeftRadius: 24,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 20,
+    elevation: 5,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 20,
   },
   title: {
-    fontSize: 28,
-    fontWeight: '700',
-    color: '#1A237E',
+    fontSize: 26,
+    fontWeight: '800',
+    color: '#FFF',
+    letterSpacing: 0.5,
+    textShadowColor: 'rgba(0,0,0,0.1)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 4,
   },
   addButton: {
-    backgroundColor: '#007AFF',
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    backgroundColor: '#10B981',
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     justifyContent: 'center',
-    alignItems: 'center',
-    elevation: 3,
-  },
-  searchContainer: {
-    marginBottom: 20,
-    position: 'relative',
-  },
-  searchInput: {
-    backgroundColor: '#FFF',
-    height: 50,
-    borderRadius: 12,
-    paddingHorizontal: 45,
-    fontSize: 16,
-    color: '#333',
-    borderWidth: 1,
-    borderColor: '#E0E0E0',
-  },
-  searchLoader: {
-    position: 'absolute',
-    right: 20,
-    top: 13,
-  },
-  patientCard: {
-    backgroundColor: '#FFF',
-    borderRadius: 16,
-    padding: 20,
-    marginBottom: 15,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2,
+    shadowOpacity: 0.2,
+    shadowRadius: 6,
+    elevation: 3,
+  },
+  searchContainer: {
+    marginHorizontal: 20,
+    marginTop: -12,
+    backgroundColor: '#FFF',
+    borderRadius: 14,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    shadowColor: '#4f46e5',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 3,
+    height: 52,
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: 16,
+    color: '#1e293b',
+    paddingLeft: 40,
+    fontFamily: 'System',
+  },
+  searchIcon: {
+    position: 'absolute',
+    left: 20,
+    zIndex: 1,
+  },
+  patientCard: {
+    backgroundColor: '#fff',
+    borderRadius: 18,
+    marginHorizontal: 20,
+    marginBottom: 16,
+    padding: 18,
+    flexDirection: 'row',
+    alignItems: 'center',
+    shadowColor: '#64748b',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 6,
+    elevation: 1,
+    borderWidth: 1,
+    borderColor: '#f1f5f9',
+  },
+  avatar: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: '#6366f1',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 16,
+  },
+  avatarText: {
+    color: '#fff',
+    fontSize: 19,
+    fontWeight: '600',
+    textTransform: 'uppercase',
   },
   patientInfo: {
     flex: 1,
   },
   patientName: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#1A237E',
-    marginBottom: 8,
+    fontSize: 17,
+    fontWeight: '700',
+    color: '#1e293b',
+    marginBottom: 6,
   },
-  detailRow: {
+  detailsContainer: {
+    flexDirection: 'row',
+    gap: 16,
+  },
+  detailItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 4,
+    gap: 6,
   },
-  patientDetail: {
-    fontSize: 14,
-    color: '#666',
-    marginLeft: 6,
+  detailText: {
+    fontSize: 13.5,
+    color: '#64748b',
+    letterSpacing: -0.1,
   },
   actions: {
     flexDirection: 'row',
-    gap: 12,
+    gap: 10,
     marginLeft: 10,
   },
-  actionButton: {
-    padding: 8,
-  },
-  errorCard: {
-    backgroundColor: '#FFEBEE',
-    padding: 15,
-    borderRadius: 12,
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 15,
-  },
-  errorText: {
-    color: '#FF3B30',
-    marginLeft: 10,
-    fontSize: 14,
-  },
-  emptyState: {
-    flex: 1,
+  iconButton: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 60,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
   },
-  emptyText: {
-    color: '#9E9E9E',
-    fontSize: 16,
-    marginTop: 15,
+  viewButton: {
+    backgroundColor: '#3B82F6',
+  },
+  editButton: {
+    backgroundColor: '#10B981',
+  },
+  deleteButton: {
+    backgroundColor: '#EF4444',
   },
   modalContainer: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    backgroundColor: 'rgba(0,0,0,0.4)',
     justifyContent: 'center',
     alignItems: 'center',
   },
   modalContent: {
     backgroundColor: '#FFF',
-    width: width * 0.85,
-    borderRadius: 16,
+    width: width * 0.82,
+    borderRadius: 24,
     padding: 24,
+    borderWidth: 1,
+    borderColor: '#f1f5f9',
   },
   modalHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 15,
+    marginBottom: 16,
   },
   modalTitle: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: '#1A237E',
-    marginLeft: 10,
+    fontSize: 19,
+    fontWeight: '700',
+    color: '#1e293b',
+    marginLeft: 12,
   },
   modalText: {
-    color: '#666',
-    fontSize: 16,
-    lineHeight: 24,
-    marginBottom: 25,
+    color: '#64748b',
+    fontSize: 15,
+    lineHeight: 22,
+    marginVertical: 16,
   },
   modalButtons: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
-    gap: 15,
+    gap: 16,
   },
   modalButton: {
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 10,
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 12,
   },
   cancelButton: {
-    backgroundColor: '#F0F0F0',
+    backgroundColor: '#F1F5F9',
   },
   cancelButtonText: {
-    color: '#666',
-    fontWeight: '500',
+    color: '#64748B',
+    fontWeight: '600',
   },
   confirmButton: {
-    backgroundColor: '#FF3B30',
+    backgroundColor: '#EF4444',
   },
   confirmButtonText: {
     color: '#FFF',
-    fontWeight: '500',
+    fontWeight: '600',
   },
-  scrollContent: {
-    paddingBottom: 30,
+  emptyState: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    minHeight: height * 0.5,
+  },
+  emptyText: {
+    color: '#94a3b8',
+    fontSize: 16,
+    marginTop: 14,
+    fontWeight: '500',
   },
 });
 
-export default PatientsListScreen;
+export default PatientListScreen;
