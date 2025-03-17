@@ -82,36 +82,60 @@ const LoginScreen = ({ navigation, setIsAuthenticated }) => {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={styles.container}
     >
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <Image
-          source={require('../assets/logo-png.png')}
-          style={[styles.logo, { borderRadius: 20 }]}
-        />
-        <Text style={styles.title}>Connexion</Text>
+      <ScrollView 
+        contentContainerStyle={styles.scrollContainer}
+        keyboardShouldPersistTaps="handled"
+      >
+        <View style={styles.logoContainer}>
+          <Image
+            source={require('../assets/logo-png.png')}
+            style={styles.logo}
+          />
+        </View>
 
-        <View style={styles.inputContainer}>
-          <MaterialIcons name="email" size={20} color="#666" style={styles.icon} />
+        <Text style={styles.title}>Bienvenue !</Text>
+        <Text style={styles.subtitle}>Connectez-vous pour continuer</Text>
+
+        {/* Email Input */}
+        <View style={[styles.inputContainer, errors.email && styles.inputError]}>
+          <MaterialIcons 
+            name="email" 
+            size={20} 
+            color={errors.email ? '#FF4444' : '#70B2F9'} 
+            style={styles.icon} 
+          />
           <TextInput
             placeholder="Adresse email"
+            placeholderTextColor="#A0AEC0"
             value={email}
             onChangeText={setEmail}
             style={styles.input}
             autoCapitalize="none"
             keyboardType="email-address"
-            placeholderTextColor="#999"
           />
         </View>
-        {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
+        {errors.email && (
+          <View style={styles.errorContainer}>
+            <MaterialIcons name="error-outline" size={14} color="#FF4444" />
+            <Text style={styles.errorText}>{errors.email}</Text>
+          </View>
+        )}
 
-        <View style={styles.inputContainer}>
-          <MaterialIcons name="lock" size={20} color="#666" style={styles.icon} />
+        {/* Password Input */}
+        <View style={[styles.inputContainer, errors.password && styles.inputError]}>
+          <MaterialIcons 
+            name="lock" 
+            size={20} 
+            color={errors.password ? '#FF4444' : '#70B2F9'} 
+            style={styles.icon} 
+          />
           <TextInput
             placeholder="Mot de passe"
+            placeholderTextColor="#A0AEC0"
             value={password}
             secureTextEntry={!showPassword}
             onChangeText={setPassword}
             style={styles.input}
-            placeholderTextColor="#999"
           />
           <TouchableOpacity 
             onPress={() => setShowPassword(!showPassword)}
@@ -120,27 +144,38 @@ const LoginScreen = ({ navigation, setIsAuthenticated }) => {
             <MaterialIcons 
               name={showPassword ? 'visibility-off' : 'visibility'} 
               size={20} 
-              color="#666" 
+              color={errors.password ? '#FF4444' : '#666'} 
             />
           </TouchableOpacity>
         </View>
-        {errors.password && <Text style={styles.errorText}>{errors.password}</Text>}
+        {errors.password && (
+          <View style={styles.errorContainer}>
+            <MaterialIcons name="error-outline" size={14} color="#FF4444" />
+            <Text style={styles.errorText}>{errors.password}</Text>
+          </View>
+        )}
 
+        {/* Remember Me */}
         <View style={styles.rememberMeContainer}>
-          <TouchableOpacity onPress={() => setRememberMe(!rememberMe)}>
+          <TouchableOpacity 
+            onPress={() => setRememberMe(!rememberMe)}
+            style={styles.checkbox}
+          >
             <MaterialIcons 
               name={rememberMe ? 'check-box' : 'check-box-outline-blank'} 
               size={24} 
-              color={rememberMe ? '#1E90FF' : '#666'} 
+              color={rememberMe ? '#70B2F9' : '#CBD5E0'} 
             />
           </TouchableOpacity>
           <Text style={styles.rememberMeText}>Se souvenir de moi</Text>
         </View>
 
+        {/* Login Button */}
         <TouchableOpacity 
           style={[styles.loginButton, isLoading && styles.disabledButton]}
           onPress={handleLogin}
           disabled={isLoading}
+          activeOpacity={0.9}
         >
           {isLoading ? (
             <ActivityIndicator color="#fff" />
@@ -148,6 +183,19 @@ const LoginScreen = ({ navigation, setIsAuthenticated }) => {
             <Text style={styles.buttonText}>Se connecter</Text>
           )}
         </TouchableOpacity>
+
+        {/* Forgot Password */}
+        <TouchableOpacity style={styles.forgotPassword}>
+          <Text style={styles.linkText}>Mot de passe oublié ?</Text>
+        </TouchableOpacity>
+
+        {/* Signup Section */}
+        <View style={styles.signupContainer}>
+          <Text style={styles.signupText}>Pas de compte ? </Text>
+          <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
+            <Text style={styles.signupLink}>S'inscrire</Text>
+          </TouchableOpacity>
+        </View>
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -156,91 +204,132 @@ const LoginScreen = ({ navigation, setIsAuthenticated }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#F8FAFC',
   },
   scrollContainer: {
     flexGrow: 1,
     justifyContent: 'center',
     padding: 30,
   },
+  logoContainer: {
+    alignItems: 'center',
+    marginBottom: 40,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 3,
+  },
   logo: {
-    width: 150,
-    height: 150,
-    alignSelf: 'center',
-    marginBottom: 30,
+    width: 120,
+    height: 120,
+    borderRadius: 20,
   },
   title: {
     fontSize: 28,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 40,
+    fontWeight: '700',
+    color: '#1A365D',
     textAlign: 'center',
+    marginBottom: 8,
+  },
+  subtitle: {
+    fontSize: 16,
+    color: '#718096',
+    textAlign: 'center',
+    marginBottom: 40,
   },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    backgroundColor: '#FFFFFF',
     borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
+    borderColor: '#E2E8F0',
+    borderRadius: 12,
     marginBottom: 10,
-    paddingHorizontal: 10,
+    paddingHorizontal: 15,
+    height: 56,
+  },
+  inputError: {
+    borderColor: '#FF4444',
   },
   icon: {
-    marginRight: 10,
+    marginRight: 12,
   },
   input: {
     flex: 1,
-    height: 50,
-    color: '#333',
+    height: '100%',
+    color: '#2D3748',
+    fontSize: 16,
   },
   eyeIcon: {
-    padding: 10,
+    padding: 8,
+    marginLeft: 8,
+  },
+  errorContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 15,
+    marginTop: -5,
   },
   errorText: {
-    color: 'red',
-    fontSize: 12,
-    marginBottom: 15,
+    color: '#FF4444',
+    fontSize: 13,
+    marginLeft: 4,
   },
   rememberMeContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginVertical: 15,
-  },
-  rememberMeText: {
-    marginLeft: 8,
-    color: '#666',
-  },
-  loginButton: {
-    backgroundColor: '#1E90FF',
-    padding: 15,
-    borderRadius: 8,
-    alignItems: 'center',
     marginVertical: 20,
   },
+  checkbox: {
+    marginRight: 8,
+  },
+  rememberMeText: {
+    color: '#4A5568',
+    fontSize: 14,
+  },
+  loginButton: {
+    backgroundColor: '#70B2F9',
+    paddingVertical: 16,
+    borderRadius: 12,
+    alignItems: 'center',
+    marginVertical: 10,
+    shadowColor: '#70B2F9',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 5,
+  },
   disabledButton: {
-    backgroundColor: '#87CEFA',
+    opacity: 0.7,
   },
   buttonText: {
-    color: 'white',
-    fontWeight: 'bold',
+    color: '#FFFFFF',
+    fontWeight: '600',
     fontSize: 16,
   },
+  forgotPassword: {
+    alignSelf: 'center',
+    marginTop: 20,
+  },
   linkText: {
-    color: '#1E90FF',
-    textAlign: 'center',
-    marginTop: 10,
+    color: '#70B2F9',
+    fontWeight: '500',
+    fontSize: 14,
   },
   signupContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
-    marginTop: 30,
+    marginTop: 40,
   },
   signupText: {
-    color: '#666',
+    color: '#718096',
+    fontSize: 14,
   },
   signupLink: {
-    color: '#1E90FF',
-    fontWeight: 'bold',
+    color: '#70B2F9',
+    fontWeight: '600',
+    fontSize: 14,
   },
 });
 

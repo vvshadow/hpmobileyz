@@ -33,7 +33,7 @@ const Menu = ({ navigation }) => {
         onPress={() => navigation.navigate('Patients')}
       >
         <Icon name="supervised-user-circle" size={24} color="#333" />
-        <Text style={styles.menuText}>Patients</Text>
+        <Text style={styles.menuText}>Les Patients</Text>
       </TouchableOpacity>
     </View>
   );
