@@ -23,7 +23,7 @@ const PatientViewScreen = ({ navigation, route }) => {
   const fetchPatient = async () => {
     try {
       const token = await AsyncStorage.getItem('token');
-      const response = await fetch(`http://192.168.1.117:8000/api/patients/${id}`, {
+      const response = await fetch(`http://192.0.0.2:8000/api/patients/${id}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -236,7 +236,7 @@ const styles = StyleSheet.create({
     marginTop: 16,
   },
   profileIcon: {
-    backgroundColor: '#4F46E5',
+    backgroundColor: '#7381F7',
     width: 72,
     height: 72,
     borderRadius: 36,
@@ -245,7 +245,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   profileIconShadow: {
-    shadowColor: '#4F46E5',
+    shadowColor: '#7381F7',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
     shadowRadius: 12,
@@ -259,7 +259,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   lastName: {
-    color: '#4F46E5',
+    color: '#7381F7',
   },
   patientId: {
     fontSize: 14,
@@ -322,7 +322,7 @@ const styles = StyleSheet.create({
   },
   itemLabel: {
     fontSize: 14,
-    color: '#64748B',
+    color: '#7381F7',
     marginBottom: 4,
     fontWeight: '500',
   },
@@ -338,7 +338,7 @@ const styles = StyleSheet.create({
     marginHorizontal: -24,
   },
   editButton: {
-    backgroundColor: '#4F46E5',
+    backgroundColor: '#7381F7',
     borderRadius: 12,
     padding: 18,
     flexDirection: 'row',
