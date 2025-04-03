@@ -12,7 +12,7 @@ import {
   Dimensions,
   FlatList,
 } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as SecureStore from 'expo-secure-store';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { debounce } from 'lodash';
 
@@ -30,8 +30,8 @@ const PatientListScreen = ({ navigation }) => {
 
   const fetchPatients = async (query = '') => {
     try {
-      const token = await AsyncStorage.getItem('token');
-      const url = `http://192.168.1.117:8000/api/patients?search=${query}`;
+      const token = await SecureStore.getItemAsync('authToken');
+      const url = `http://192.168.1.113:8000/api/patients?search=${query}`;
       const response = await fetch(url, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -75,8 +75,8 @@ const PatientListScreen = ({ navigation }) => {
 
   const handleDelete = async (id) => {
     try {
-      const token = await AsyncStorage.getItem('token');
-      const response = await fetch(`http://192.168.1.117:8000/api/patients/${id}`, {
+      const token = await SecureStore.getItemAsync('authToken');
+      const response = await fetch(`http://192.168.1.113:8000/api/patients/${id}`, {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -234,6 +234,7 @@ const PatientListScreen = ({ navigation }) => {
   );
 };
 
+// Les styles restent identiques à la version précédente
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -334,7 +335,7 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
     borderRadius: 25,
-    backgroundColor: '#6366f1',
+    backgroundColor: '#7381F7',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 16,
@@ -385,10 +386,10 @@ const styles = StyleSheet.create({
     shadowRadius: 3,
   },
   viewButton: {
-    backgroundColor: '#3B82F6',
+    backgroundColor: '#4B8BF3',
   },
   editButton: {
-    backgroundColor: '#10B981',
+    backgroundColor: '#2BD99F',
   },
   deleteButton: {
     backgroundColor: '#EF4444',

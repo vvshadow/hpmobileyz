@@ -35,6 +35,13 @@ const Menu = ({ navigation }) => {
         <Icon name="supervised-user-circle" size={24} color="#333" />
         <Text style={styles.menuText}>Les Patients</Text>
       </TouchableOpacity>
+      <TouchableOpacity 
+        style={styles.menuItem}
+        onPress={() => navigation.navigate('SejourList')}
+      >
+        <Icon name="local-hospital" size={24} color="#333" />
+        <Text style={styles.menuText}>Les Séjours</Text>
+      </TouchableOpacity>
     </View>
   );
 };

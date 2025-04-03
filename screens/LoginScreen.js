@@ -14,10 +14,10 @@ import {
 } from 'react-native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as SecureStore from 'expo-secure-store';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
-const API_URL = 'http://192.168.1.117:8000/api';
-//const API_URL = 'http://192.0.0.2:8000/api';
+const API_URL = 'http://192.168.1.113:8000/api';
 
 const LoginScreen = ({ navigation, setIsAuthenticated }) => {
   const [email, setEmail] = useState('');
@@ -30,10 +30,8 @@ const LoginScreen = ({ navigation, setIsAuthenticated }) => {
   useEffect(() => {
     const loadSavedCredentials = async () => {
       const savedEmail = await AsyncStorage.getItem('email');
-      const savedPassword = await AsyncStorage.getItem('password');
-      if (savedEmail && savedPassword) {
+      if (savedEmail) {
         setEmail(savedEmail);
-        setPassword(savedPassword);
         setRememberMe(true);
       }
     };
@@ -61,11 +59,14 @@ const LoginScreen = ({ navigation, setIsAuthenticated }) => {
         { headers: { 'Content-Type': 'application/json' } }
       );
 
-      await AsyncStorage.setItem('token', response.data.token);
+      // Stockage sécurisé du token avec SecureStore
+      await SecureStore.setItemAsync('authToken', response.data.token);
+
+      // Gestion du "Se souvenir de moi"
       if (rememberMe) {
-        await AsyncStorage.multiSet([['email', email], ['password', password]]);
+        await AsyncStorage.setItem('email', email);
       } else {
-        await AsyncStorage.multiRemove(['email', 'password']);
+        await AsyncStorage.removeItem('email');
       }
 
       setIsAuthenticated(true);
@@ -201,6 +202,7 @@ const LoginScreen = ({ navigation, setIsAuthenticated }) => {
     </KeyboardAvoidingView>
   );
 };
+
 
 const styles = StyleSheet.create({
   container: {

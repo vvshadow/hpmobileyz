@@ -10,7 +10,7 @@ import {
   StatusBar,
   Animated
 } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as SecureStore from 'expo-secure-store';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const PatientViewScreen = ({ navigation, route }) => {
@@ -22,8 +22,8 @@ const PatientViewScreen = ({ navigation, route }) => {
 
   const fetchPatient = async () => {
     try {
-      const token = await AsyncStorage.getItem('token');
-      const response = await fetch(`http://192.0.0.2:8000/api/patients/${id}`, {
+      const token = await SecureStore.getItemAsync('authToken');
+      const response = await fetch(`http://192.168.1.113:8000/api/patients/${id}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -62,6 +62,12 @@ const PatientViewScreen = ({ navigation, route }) => {
     });
   };
 
+  const calculateAge = (birthDate) => {
+    const diff = Date.now() - new Date(birthDate).getTime();
+    const ageDate = new Date(diff);
+    return Math.abs(ageDate.getUTCFullYear() - 1970);
+  };
+
   if (loading) {
     return (
       <SafeAreaView style={styles.loadingContainer}>
@@ -70,12 +76,6 @@ const PatientViewScreen = ({ navigation, route }) => {
       </SafeAreaView>
     );
   }
-
-  const calculateAge = (birthDate) => {
-    const diff = Date.now() - new Date(birthDate).getTime();
-    const ageDate = new Date(diff);
-    return Math.abs(ageDate.getUTCFullYear() - 1970);
-  };
 
   return (
     <SafeAreaView style={styles.container}>

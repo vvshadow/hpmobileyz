@@ -9,9 +9,8 @@ import {
   TouchableOpacity, 
   Modal 
 } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as SecureStore from 'expo-secure-store';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-// Si vous n'avez pas le composant Menu, vous pouvez le commenter ou l'enlever
 import Menu from '../components/Menu';
 
 const ProfileScreen = ({ navigation, setIsAuthenticated }) => {
@@ -22,28 +21,31 @@ const ProfileScreen = ({ navigation, setIsAuthenticated }) => {
 
   const fetchProfile = async () => {
     try {
-      const token = await AsyncStorage.getItem('token');
+      const token = await SecureStore.getItemAsync('authToken');
       if (!token) {
         setIsAuthenticated(false);
         return;
       }
-      const response = await fetch('http://192.168.1.117:8000/api/profile', {
+      
+      const response = await fetch('http://192.168.1.113:8000/api/profile', {
         method: 'GET',
         headers: {
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
       });
-      const data = await response.json();
+
       if (!response.ok) {
-        throw new Error(data.message || 'Erreur lors de la récupération du profil');
+        throw new Error('Erreur de récupération du profil');
       }
+
+      const data = await response.json();
       setUserData(data);
       setLoading(false);
     } catch (err) {
       setError(err.message);
       setLoading(false);
-      await AsyncStorage.removeItem('token');
+      await SecureStore.deleteItemAsync('authToken');
       setIsAuthenticated(false);
     }
   };
@@ -53,7 +55,7 @@ const ProfileScreen = ({ navigation, setIsAuthenticated }) => {
   }, []);
 
   const handleLogout = async () => {
-    await AsyncStorage.removeItem('token');
+    await SecureStore.deleteItemAsync('authtoken');
     setIsAuthenticated(false);
   };
 
@@ -96,7 +98,7 @@ const ProfileScreen = ({ navigation, setIsAuthenticated }) => {
 
         <View style={styles.infoContainer}>
           <View style={styles.infoCard}>
-            <Icon name="info" size={24} color="#007AFF" />
+            <Icon name="fingerprint" size={24} color="#007AFF" />
             <View style={styles.infoContent}>
               <Text style={styles.infoLabel}>ID Utilisateur</Text>
               <Text style={styles.infoValue}>{userData?.id}</Text>
@@ -120,7 +122,6 @@ const ProfileScreen = ({ navigation, setIsAuthenticated }) => {
         </TouchableOpacity>
       </ScrollView>
 
-      {/** Si vous n'avez pas de composant Menu, vous pouvez commenter la ligne suivante */}
       <Menu navigation={navigation} />
 
       <Modal

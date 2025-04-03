@@ -11,7 +11,7 @@ import {
   Alert,
   Platform
 } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as SecureStore from 'expo-secure-store';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const PatientFormScreen = ({ navigation, route }) => {
@@ -36,12 +36,12 @@ const PatientFormScreen = ({ navigation, route }) => {
 
     setLoading(true);
     try {
-      const token = await AsyncStorage.getItem('token');
+      const token = await SecureStore.getItemAsync('authToken');
       if (!token) throw new Error('Authentification requise');
 
       const url = patient 
-        ? `http://192.168.1.117:8000/api/patients/${patient.id}`
-        : 'http://192.168.1.117:8000/api/patients';
+        ? `http://192.168.1.113:8000/api/patients/${patient.id}`
+        : 'http://192.168.1.113:8000/api/patients';
       
       const response = await fetch(url, {
         method: patient ? 'PUT' : 'POST',
@@ -166,10 +166,10 @@ const styles = StyleSheet.create({
     fontSize: 26,
     fontWeight: '700',
     color: '#2d4059',
-    marginRight: 10, // Espacement entre le texte et l'icône
+    marginRight: 10,
   },
   titleIcon: {
-    marginTop: 3, // Ajustement fin de l'alignement vertical si nécessaire
+    marginTop: 3,
   },
   formContainer: {
     backgroundColor: '#ffffff',
