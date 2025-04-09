@@ -166,12 +166,7 @@ const SejourListScreen = ({ navigation }) => {
       </View>
 
       <View style={styles.actionsContainer}>
-        <TouchableOpacity
-          style={[styles.actionButton, styles.viewButton]}
-          onPress={() => navigation.navigate('SejourView', { id: item.id })}
-        >
-          <Icon name="visibility" size={20} color="white" />
-        </TouchableOpacity>
+    
 
         <TouchableOpacity
           style={[styles.actionButton, styles.editButton]}
