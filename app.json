@@ -19,10 +19,20 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.zzz2005.hpmobile"
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "ba16c7fe-dd8f-4136-a4ee-10490b03258b"
+      }
+    },
+    "owner": "zzz2005",
+    "plugins": [
+      "expo-secure-store"
+    ]
   }
 }
