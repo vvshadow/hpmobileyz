@@ -18,7 +18,7 @@ import { debounce } from 'lodash';
 
 const { width, height } = Dimensions.get('window');
 
-// Définir l'URL de base de manière cohérente sur tous vos appels API
+// URL de base pour vos requêtes API
 const BASE_URL = 'http://192.168.1.135:8000/api';
 
 const SejourListScreen = ({ navigation }) => {
@@ -47,25 +47,20 @@ const SejourListScreen = ({ navigation }) => {
         navigation.navigate('Login');
         return;
       }
-
-      // On utilise la variable BASE_URL pour garantir la cohérence
       const url = `${BASE_URL}/sejours`;
       const response = await fetch(url, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-
       if (response.status === 401) {
         await SecureStore.deleteItemAsync('authToken');
         navigation.navigate('Login');
         return;
       }
-
       if (!response.ok) throw new Error('Erreur de chargement des données');
-
       const data = await response.json();
-      // Si l'API renvoie un objet de collection, extraire le tableau d'éléments dans member
+      // Extraire le tableau de séjours depuis data.member (si présent)
       const sejoursList = data.member || data;
       setSejours(sejoursList);
       setFilteredSejours(sejoursList);
@@ -77,7 +72,6 @@ const SejourListScreen = ({ navigation }) => {
     }
   };
 
-  // Fonction de recherche avec debounce
   const debouncedSearch = useCallback(
     debounce((query) => fetchSejours(query), 600),
     []
@@ -92,7 +86,6 @@ const SejourListScreen = ({ navigation }) => {
         fetchSejours('');
       }
     };
-
     checkAuthAndFetch();
   }, []);
 
@@ -112,24 +105,18 @@ const SejourListScreen = ({ navigation }) => {
         navigation.navigate('Login');
         return;
       }
-
-      // Attention à utiliser la même URL de base pour DELETE
       const response = await fetch(`${BASE_URL}/sejours/${id}`, {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-
       if (response.status === 401) {
         await SecureStore.deleteItemAsync('authToken');
         navigation.navigate('Login');
         return;
       }
-
       if (!response.ok) throw new Error('Échec de la suppression');
-
-      // Mise à jour des séjours localement après suppression
       const updatedSejours = filteredSejours.filter(s => s.id !== id);
       setFilteredSejours(updatedSejours);
       Alert.alert('Succès', 'Séjour supprimé avec succès');
@@ -171,19 +158,34 @@ const SejourListScreen = ({ navigation }) => {
           </View>
           <View style={styles.locationRow}>
             <Icon name="meeting-room" size={18} color="#4B5563" />
-            <Text style={styles.detailText}>Chambre {item.lit?.chambre?.numchambre}</Text>
+            <Text style={styles.detailText}>
+              Chambre {item.lit?.chambre?.numchambre}
+            </Text>
           </View>
         </View>
       </View>
 
       <View style={styles.actionsContainer}>
-      
+        <TouchableOpacity
+          style={[styles.actionButton, styles.viewButton]}
+          onPress={() => navigation.navigate('SejourView', { id: item.id })}
+        >
+          <Icon name="visibility" size={20} color="white" />
+        </TouchableOpacity>
 
         <TouchableOpacity
           style={[styles.actionButton, styles.editButton]}
           onPress={() => navigation.navigate('SejourEdit', { sejour: item })}
         >
           <Icon name="edit" size={20} color="white" />
+        </TouchableOpacity>
+
+        {/* Bouton de validation d'arrivée */}
+        <TouchableOpacity
+          style={[styles.actionButton, styles.validateButton]}
+          onPress={() => navigation.navigate('ValiderArriverScreen', { id: item.id })}
+        >
+          <Icon name="check-circle" size={20} color="white" />
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -292,10 +294,7 @@ const SejourListScreen = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F3F4F6',
-  },
+  container: { flex: 1, backgroundColor: '#F3F4F6' },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -306,11 +305,7 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 20,
     elevation: 4,
   },
-  headerTitle: {
-    color: 'white',
-    fontSize: 22,
-    fontWeight: '700',
-  },
+  headerTitle: { color: 'white', fontSize: 22, fontWeight: '700' },
   addButton: {
     backgroundColor: '#10B981',
     padding: 12,
@@ -326,17 +321,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     elevation: 2,
   },
-  searchInput: {
-    flex: 1,
-    height: 50,
-    color: '#1F2937',
-    fontSize: 16,
-    paddingLeft: 40,
-  },
-  searchIcon: {
-    position: 'absolute',
-    left: 16,
-  },
+  searchInput: { flex: 1, height: 50, color: '#1F2937', fontSize: 16, paddingLeft: 40 },
+  searchIcon: { position: 'absolute', left: 16 },
   sejourCard: {
     backgroundColor: 'white',
     borderRadius: 12,
@@ -353,39 +339,14 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#E5E7EB',
   },
-  dateText: {
-    color: '#6B7280',
-    fontSize: 14,
-    fontWeight: '500',
-  },
+  dateText: { color: '#6B7280', fontSize: 14, fontWeight: '500' },
   patientInfo: {},
-  patientName: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#1F2937',
-    marginBottom: 4,
-  },
-  serviceText: {
-    color: '#3B82F6',
-    fontWeight: '500',
-    fontSize: 14,
-  },
-  infoContainer: {
-    marginTop: 12,
-  },
-  locationInfo: {
-    marginTop: 12,
-    gap: 8,
-  },
-  locationRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  detailText: {
-    color: '#4B5563',
-    fontSize: 14,
-  },
+  patientName: { fontSize: 18, fontWeight: '600', color: '#1F2937', marginBottom: 4 },
+  serviceText: { color: '#3B82F6', fontWeight: '500', fontSize: 14 },
+  infoContainer: { marginTop: 12 },
+  locationInfo: { marginTop: 12, gap: 8 },
+  locationRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  detailText: { color: '#4B5563', fontSize: 14 },
   actionsContainer: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
@@ -400,78 +361,28 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     elevation: 2,
   },
-  viewButton: {
-    backgroundColor: '#3B82F6',
-  },
-  editButton: {
-    backgroundColor: '#10B981',
-  },
-  deleteButton: {
-    backgroundColor: '#EF4444',
-  },
+  viewButton: { backgroundColor: '#3B82F6' },
+  editButton: { backgroundColor: '#10B981' },
+  validateButton: { backgroundColor: '#34D399' },
+  deleteButton: { backgroundColor: '#EF4444' },
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.5)',
     justifyContent: 'center',
     alignItems: 'center',
   },
-  modalContent: {
-    backgroundColor: 'white',
-    width: '80%',
-    borderRadius: 16,
-    padding: 20,
-  },
-  modalHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    marginBottom: 16,
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#1F2937',
-  },
-  modalBody: {
-    color: '#6B7280',
-    fontSize: 16,
-    lineHeight: 24,
-    marginBottom: 24,
-  },
-  modalActions: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    gap: 16,
-  },
-  modalButton: {
-    paddingVertical: 10,
-    paddingHorizontal: 24,
-    borderRadius: 8,
-  },
-  cancelButton: {
-    backgroundColor: '#F3F4F6',
-  },
-  confirmButton: {
-    backgroundColor: '#EF4444',
-  },
-  buttonText: {
-    fontWeight: '600',
-    fontSize: 16,
-  },
-  confirmText: {
-    color: 'white',
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: 20,
-  },
-  loadingText: {
-    color: '#3B82F6',
-    fontSize: 16,
-    fontWeight: '500',
-  },
+  modalContent: { backgroundColor: 'white', width: '80%', borderRadius: 16, padding: 20 },
+  modalHeader: { flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 16 },
+  modalTitle: { fontSize: 18, fontWeight: '600', color: '#1F2937' },
+  modalBody: { color: '#6B7280', fontSize: 16, lineHeight: 24, marginBottom: 24 },
+  modalActions: { flexDirection: 'row', justifyContent: 'flex-end', gap: 16 },
+  modalButton: { paddingVertical: 10, paddingHorizontal: 24, borderRadius: 8 },
+  cancelButton: { backgroundColor: '#F3F4F6' },
+  confirmButton: { backgroundColor: '#EF4444' },
+  buttonText: { fontWeight: '600', fontSize: 16 },
+  confirmText: { color: 'white' },
+  loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', gap: 20 },
+  loadingText: { color: '#3B82F6', fontSize: 16, fontWeight: '500' },
   errorContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -482,26 +393,10 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     marginTop: 16,
   },
-  errorText: {
-    color: '#DC2626',
-    fontSize: 14,
-    flex: 1,
-  },
-  emptyContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    minHeight: 300,
-    gap: 16,
-  },
-  emptyText: {
-    color: '#9CA3AF',
-    fontSize: 16,
-    fontWeight: '500',
-  },
-  listContent: {
-    paddingBottom: 20,
-  },
+  errorText: { color: '#DC2626', fontSize: 14, flex: 1 },
+  emptyContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', minHeight: 300, gap: 16 },
+  emptyText: { color: '#9CA3AF', fontSize: 16, fontWeight: '500' },
+  listContent: { paddingBottom: 20 },
 });
 
 export default SejourListScreen;
