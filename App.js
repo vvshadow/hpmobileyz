@@ -10,6 +10,8 @@ import ProfileScreen from './screens/ProfileScreen';
 import PatientsListScreen from './screens/PatientListScreen';
 import PatientViewScreen from './screens/PatientViewScreen';
 import PatientFormScreen from './screens/PatientFormScreen';
+import SejourListScreen from './screens/SejourListScreen';
+import SejourFormScreen from './screens/SejourFormScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -65,6 +67,22 @@ const App = () => {
               component={PatientFormScreen} 
               options={{ title: 'Modifier Patient' }} 
             />
+              <Stack.Screen 
+              name="SejourList" 
+              component={SejourListScreen} 
+              options={{ title: 'Détails Séjour' }} 
+            />
+            <Stack.Screen 
+              name="SejourCreate" 
+              component={SejourFormScreen} 
+              options={{ title: 'Nouveau Séjour' }} 
+            />
+            <Stack.Screen 
+              name="SejourEdit" 
+              component={SejourFormScreen} 
+              options={{ title: 'Modifier Séjour' }} 
+            />
+
             <Stack.Screen 
               name="Profile" 
               options={{ title: 'Profil Utilisateur' }}
