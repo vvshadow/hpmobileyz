@@ -58,6 +58,7 @@ const ValiderArriverScreen = ({ route, navigation }) => {
       const data = await response.json();
       setSejour(data);
       setComment(data.commentaire || '');
+      setSelectedValue(data.arrive || 'Non');
     } catch (err) {
       Alert.alert('Erreur', err.message);
     } finally {
@@ -95,7 +96,7 @@ const ValiderArriverScreen = ({ route, navigation }) => {
         navigation.navigate('Login');
         return;
       }
-      if (!response.ok) throw new Error("Échec de la validation d'arrivée");
+      if (!response.ok) throw new Error("Échec de la mise à jour du séjour");
       
       Alert.alert('Succès', "Les informations ont bien été mises à jour");
       navigation.goBack();
@@ -129,13 +130,25 @@ const ValiderArriverScreen = ({ route, navigation }) => {
             <Text style={styles.infoValue}>
               {sejour.patient.prenom} {sejour.patient.nom}
             </Text>
+
+            <Text style={styles.infoLabel}>Service :</Text>
+            <View style={styles.serviceBadge}>
+              <Text style={styles.serviceText}>
+                {sejour.lit?.chambre?.service?.nomserv || 'Non spécifié'}
+              </Text>
+            </View>
+
+            <Text style={styles.infoLabel}>Lit :</Text>
+            <Text style={styles.infoValue}>
+              Chambre {sejour.lit?.chambre?.numchambre} - Lit {sejour.lit?.numlit}
+            </Text>
           </View>
         ) : (
-          <Text style={styles.infoValue}>Aucune information patient disponible</Text>
+          <Text style={styles.infoValue}>Aucune information disponible</Text>
         )}
 
         <View style={styles.inputContainer}>
-          <Text style={styles.label}>Patient Arrivé ?</Text>
+          <Text style={styles.label}>Patient Arrivé ?</Text>
           <TouchableOpacity 
             style={styles.pickerButton}
             onPress={() => setShowPicker(true)}
@@ -215,9 +228,29 @@ const styles = StyleSheet.create({
     padding: 16,
     elevation: 2,
     marginBottom: 20,
+    gap: 12,
   },
-  infoLabel: { fontSize: 16, color: '#3B82F6', fontWeight: '600', marginBottom: 4 },
-  infoValue: { fontSize: 16, color: '#1F2937' },
+  infoLabel: {
+    fontSize: 16,
+    color: '#3B82F6',
+    fontWeight: '600',
+  },
+  infoValue: { 
+    fontSize: 16, 
+    color: '#1F2937',
+    marginBottom: 8,
+  },
+  serviceBadge: {
+    backgroundColor: '#EFF6FF',
+    borderRadius: 8,
+    padding: 8,
+    alignSelf: 'flex-start',
+    marginBottom: 8,
+  },
+  serviceText: {
+    color: '#1D4ED8',
+    fontWeight: '500',
+  },
   inputContainer: {
     marginBottom: 20,
   },
