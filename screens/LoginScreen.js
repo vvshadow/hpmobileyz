@@ -17,7 +17,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as SecureStore from 'expo-secure-store';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
-const API_URL = 'http://192.168.1.135:8000/api';
+const API_URL = 'http://192.168.1.52:8000/api';
 
 const LoginScreen = ({ navigation, setIsAuthenticated }) => {
   const [email, setEmail] = useState('');

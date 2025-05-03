@@ -40,8 +40,8 @@ const PatientFormScreen = ({ navigation, route }) => {
       if (!token) throw new Error('Authentification requise');
 
       const url = patient 
-        ? `http://192.168.1.135:8000/api/patients/${patient.id}`
-        : 'http://192.168.1.135:8000/api/patients';
+        ? `http://192.168.1.52:8000/api/patients/${patient.id}`
+        : 'http://192.168.1.52:8000/api/patients';
       
       const response = await fetch(url, {
         method: patient ? 'PUT' : 'POST',

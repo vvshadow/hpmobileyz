@@ -23,7 +23,7 @@ const PatientViewScreen = ({ navigation, route }) => {
   const fetchPatient = async () => {
     try {
       const token = await SecureStore.getItemAsync('authToken');
-      const response = await fetch(`http://192.168.1.135:8000/api/patients/${id}`, {
+      const response = await fetch(`http://192.168.1.52:8000/api/patients/${id}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },

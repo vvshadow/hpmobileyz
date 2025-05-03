@@ -27,7 +27,7 @@ const ProfileScreen = ({ navigation, setIsAuthenticated }) => {
         return;
       }
       
-      const response = await fetch('http://192.168.1.135:8000/api/profile', {
+      const response = await fetch('http://192.168.1.52:8000/api/profile', {
         method: 'GET',
         headers: {
           Authorization: `Bearer ${token}`,

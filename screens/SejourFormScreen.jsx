@@ -60,8 +60,8 @@ const SejourFormScreen = ({ navigation, route }) => {
     try {
       const token = await AsyncStorage.getItem('token');
       const url = sejour 
-        ? `http://192.168.1.135:8000/api/sejours/${sejour.id}`
-        : 'http://192.168.1.135:8000/api/sejours';
+        ? `http://192.168.1.52:8000/api/sejours/${sejour.id}`
+        : 'http://192.168.1.52:8000/api/sejours';
 
       const payload = {
         ...formData,

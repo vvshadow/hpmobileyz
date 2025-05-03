@@ -19,7 +19,7 @@ import { debounce } from 'lodash';
 const { width, height } = Dimensions.get('window');
 
 // URL de base pour vos requêtes API
-const BASE_URL = 'http://192.168.1.135:8000/api';
+const BASE_URL = 'http://192.168.1.52:8000/api';
 
 const SejourListScreen = ({ navigation }) => {
   const [sejours, setSejours] = useState([]);
@@ -211,7 +211,7 @@ const SejourListScreen = ({ navigation }) => {
         <Text style={styles.headerTitle}>Gestion des Séjours</Text>
         <TouchableOpacity
           style={styles.addButton}
-          onPress={() => navigation.navigate('SejourCreate')}
+          onPress={() => navigation.navigate('AjouterSejour')}
         >
           <Icon name="add" size={28} color="white" />
         </TouchableOpacity>
