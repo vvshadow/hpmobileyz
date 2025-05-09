@@ -125,12 +125,7 @@ const UserViewScreen = ({ navigation, route }) => {
             </Text>
           </View>
 
-          <View style={styles.infoSection}>
-            <Text style={styles.label}>Date de création</Text>
-            <Text style={styles.value}>
-              {new Date(user.createdAt).toLocaleDateString()}
-            </Text>
-          </View>
+     
         </View>
 
         <View style={styles.buttonGroup}>
