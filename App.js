@@ -14,6 +14,7 @@ import SejourListScreen from './screens/SejourListScreen';
 import SejourFormScreen from './screens/SejourFormScreen';
 import ValiderArriverScreen from './screens/ValiderArriverScreen';
 import AjouterSejourScreen from './screens/AjouterSejourScreen';
+import UserListScreen from './screens/UserListScreen';
 const Stack = createNativeStackNavigator();
 
 const App = () => {
@@ -92,6 +93,11 @@ const App = () => {
               name="AjouterSejour" 
               component={AjouterSejourScreen} 
               options={{ title: 'Ajouter Séjour' }} 
+            />
+            <Stack.Screen 
+              name="UserScreen" 
+              component={UserListScreen} 
+              options={{ title: 'User' }} 
             />
 
             <Stack.Screen 

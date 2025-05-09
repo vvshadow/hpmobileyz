@@ -68,7 +68,7 @@ const Menu = ({ navigation }) => {
       {userRoles.includes('ROLE_ADMINISTRATIF') && (
         <TouchableOpacity 
           style={styles.menuItem}
-          onPress={() => navigation.navigate('Admin')}
+          onPress={() => navigation.navigate('UserScreen')}
         >
           <Icon name="admin-panel-settings" size={24} color="#333" />
           <Text style={styles.menuText}>Admin</Text>

@@ -28,6 +28,8 @@ const PatientListScreen = ({ navigation }) => {
   const [deleteVisible, setDeleteVisible] = useState(false);
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [userRoles, setUserRoles] = useState([]);
+  const [rolesLoading, setRolesLoading] = useState(true);
 
   const fetchPatients = async (query = '') => {
     try {
@@ -47,8 +49,8 @@ const PatientListScreen = ({ navigation }) => {
         query
           ? data.filter(
               (patient) =>
-                patient.prenom.toLowerCase().includes(query.toLowerCase()) ||
-                patient.nom.toLowerCase().includes(query.toLowerCase())
+                patient.prenom?.toLowerCase().includes(query.toLowerCase()) ||
+                patient.nom?.toLowerCase().includes(query.toLowerCase())
             )
           : data
       );
@@ -64,6 +66,44 @@ const PatientListScreen = ({ navigation }) => {
     debounce((query) => fetchPatients(query), 800),
     []
   );
+
+  const fetchUserRoles = async () => {
+    try {
+      const token = await SecureStore.getItemAsync('authToken');
+      const response = await fetch(`${API_URL}/me`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      
+      if (!response.ok) throw new Error('Erreur réseau');
+      
+      const userData = await response.json();
+      let roles = [];
+
+      if (Array.isArray(userData.roles)) {
+        roles = userData.roles.map(role => role.toUpperCase());
+      } else if (typeof userData.roles === 'string') {
+        roles = userData.roles.split(',').map(role => role.trim().toUpperCase());
+      }
+      
+      setUserRoles(roles);
+      
+    } catch (err) {
+      console.error('Erreur fetchUserRoles:', err);
+      Alert.alert('Erreur', 'Impossible de charger les permissions');
+    } finally {
+      setRolesLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    const initializeData = async () => {
+      await fetchUserRoles();
+      fetchPatients();
+    };
+    initializeData();
+  }, []);
 
   useEffect(() => {
     if (searchQuery === '') {
@@ -97,8 +137,8 @@ const PatientListScreen = ({ navigation }) => {
     <View style={styles.patientCard}>
       <View style={styles.avatar}>
         <Text style={styles.avatarText}>
-          {item.prenom[0]}
-          {item.nom[0]}
+          {item.prenom?.[0] || ''}
+          {item.nom?.[0] || ''}
         </Text>
       </View>
 
@@ -130,23 +170,35 @@ const PatientListScreen = ({ navigation }) => {
           <Icon name="visibility" size={20} color="#FFF" />
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={[styles.iconButton, styles.editButton]}
-          onPress={() => navigation.navigate('PatientEdit', { patient: item })}
-          activeOpacity={0.6}>
-          <Icon name="edit" size={20} color="#FFF" />
-        </TouchableOpacity>
+        {!rolesLoading && userRoles.includes('ROLE_ADMINISTRATIF') && (
+          <>
+            <TouchableOpacity
+              style={[styles.iconButton, styles.editButton]}
+              onPress={() => navigation.navigate('PatientEdit', { patient: item })}
+              activeOpacity={0.6}>
+              <Icon name="edit" size={20} color="#FFF" />
+            </TouchableOpacity>
 
-      
+            <TouchableOpacity
+              style={[styles.iconButton, styles.deleteButton]}
+              onPress={() => {
+                setSelectedPatient(item.id);
+                setDeleteVisible(true);
+              }}
+              activeOpacity={0.6}>
+              <Icon name="delete" size={20} color="#FFF" />
+            </TouchableOpacity>
+          </>
+        )}
       </View>
     </View>
   );
 
-  if (loading) {
+  if (loading || rolesLoading) {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#4F46E5" />
-        <Text style={styles.loadingText}>Chargement des patients...</Text>
+        <Text style={styles.loadingText}>Chargement en cours...</Text>
       </View>
     );
   }
@@ -155,11 +207,13 @@ const PatientListScreen = ({ navigation }) => {
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>Patients</Text>
-        <TouchableOpacity
-          style={styles.addButton}
-          onPress={() => navigation.navigate('PatientCreate')}>
-          <Icon name="add" size={28} color="#FFF" />
-        </TouchableOpacity>
+        {!rolesLoading && userRoles.includes('ROLE_ADMINISTRATIF') && (
+          <TouchableOpacity
+            style={styles.addButton}
+            onPress={() => navigation.navigate('PatientCreate')}>
+            <Icon name="add" size={28} color="#FFF" />
+          </TouchableOpacity>
+        )}
       </View>
 
       <View style={styles.searchContainer}>
@@ -227,7 +281,6 @@ const PatientListScreen = ({ navigation }) => {
   );
 };
 
-// Les styles restent identiques à la version précédente
 const styles = StyleSheet.create({
   container: {
     flex: 1,
