@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -14,7 +14,6 @@ import {
 } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { debounce } from 'lodash';
 import { API_URL } from '@env';
 
 const { width, height } = Dimensions.get('window');
@@ -38,7 +37,7 @@ const SejourListScreen = ({ navigation }) => {
     }
   };
 
-  const fetchSejours = async (query = '') => {
+  const fetchSejours = async () => {
     try {
       const token = await getAuthToken();
       if (!token) {
@@ -58,7 +57,6 @@ const SejourListScreen = ({ navigation }) => {
       }
       if (!response.ok) throw new Error('Erreur de chargement des données');
       const data = await response.json();
-      // Extraire le tableau de séjours depuis data.member (si présent)
       const sejoursList = data.member || data;
       setSejours(sejoursList);
       setFilteredSejours(sejoursList);
@@ -70,31 +68,40 @@ const SejourListScreen = ({ navigation }) => {
     }
   };
 
-  const debouncedSearch = useCallback(
-    debounce((query) => fetchSejours(query), 600),
-    []
-  );
-
   useEffect(() => {
     const checkAuthAndFetch = async () => {
       const token = await getAuthToken();
       if (!token) {
         navigation.navigate('Login');
       } else {
-        fetchSejours('');
+        fetchSejours();
       }
     };
     checkAuthAndFetch();
   }, []);
 
+  // 🔍 Filtrage local à chaque changement de `searchQuery`
   useEffect(() => {
-    if (searchQuery === '') {
-      fetchSejours('');
-    } else {
-      setSearchLoading(true);
-      debouncedSearch(searchQuery);
+    if (!searchQuery) {
+      setFilteredSejours(sejours);
+      return;
     }
-  }, [searchQuery]);
+
+    const query = searchQuery.toLowerCase();
+
+    const filtered = sejours.filter((item) => {
+      const nom = item.patient?.nom?.toLowerCase() || '';
+      const prenom = item.patient?.prenom?.toLowerCase() || '';
+      const service = item.lit?.chambre?.service?.nomserv?.toLowerCase() || '';
+      return (
+        nom.includes(query) ||
+        prenom.includes(query) ||
+        service.includes(query)
+      );
+    });
+
+    setFilteredSejours(filtered);
+  }, [searchQuery, sejours]);
 
   const handleDelete = async (id) => {
     try {
@@ -117,6 +124,7 @@ const SejourListScreen = ({ navigation }) => {
       if (!response.ok) throw new Error('Échec de la suppression');
       const updatedSejours = filteredSejours.filter(s => s.id !== id);
       setFilteredSejours(updatedSejours);
+      setSejours(sejours.filter(s => s.id !== id));
       Alert.alert('Succès', 'Séjour supprimé avec succès');
     } catch (err) {
       Alert.alert('Erreur', err.message);
@@ -138,7 +146,6 @@ const SejourListScreen = ({ navigation }) => {
           <Text style={styles.dateText}>Départ: {formatDate(item.dtedep)}</Text>
         )}
       </View>
-
       <View style={styles.infoContainer}>
         <View style={styles.patientInfo}>
           <Text style={styles.patientName}>
@@ -148,7 +155,6 @@ const SejourListScreen = ({ navigation }) => {
             {item.lit?.chambre?.service?.nomserv}
           </Text>
         </View>
-
         <View style={styles.locationInfo}>
           <View style={styles.locationRow}>
             <Icon name="bed" size={18} color="#4B5563" />
@@ -162,25 +168,19 @@ const SejourListScreen = ({ navigation }) => {
           </View>
         </View>
       </View>
-
       <View style={styles.actionsContainer}>
-    
-
         <TouchableOpacity
           style={[styles.actionButton, styles.editButton]}
           onPress={() => navigation.navigate('SejourEdit', { sejour: item })}
         >
           <Icon name="edit" size={20} color="white" />
         </TouchableOpacity>
-
-        {/* Bouton de validation d'arrivée */}
         <TouchableOpacity
           style={[styles.actionButton, styles.validateButton]}
           onPress={() => navigation.navigate('ValiderArriverScreen', { id: item.id })}
         >
           <Icon name="check-circle" size={20} color="white" />
         </TouchableOpacity>
-
         <TouchableOpacity
           style={[styles.actionButton, styles.deleteButton]}
           onPress={() => {
@@ -223,11 +223,7 @@ const SejourListScreen = ({ navigation }) => {
           value={searchQuery}
           onChangeText={setSearchQuery}
         />
-        {searchLoading ? (
-          <ActivityIndicator style={styles.searchIcon} color="#3B82F6" />
-        ) : (
-          <Icon name="search" size={24} color="#6B7280" style={styles.searchIcon} />
-        )}
+        <Icon name="search" size={24} color="#6B7280" style={styles.searchIcon} />
       </View>
 
       {error && (
@@ -250,6 +246,7 @@ const SejourListScreen = ({ navigation }) => {
         }
       />
 
+      {/* Modal suppression */}
       <Modal
         visible={deleteVisible}
         transparent
