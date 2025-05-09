@@ -31,7 +31,7 @@ const PatientListScreen = ({ navigation }) => {
   const fetchPatients = async (query = '') => {
     try {
       const token = await SecureStore.getItemAsync('authToken');
-      const url = `http://192.168.1.52:8000/api/patients?search=${query}`;
+      const url = `http://172.20.10.2:8000/api/patients?search=${query}`;
       const response = await fetch(url, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -76,7 +76,7 @@ const PatientListScreen = ({ navigation }) => {
   const handleDelete = async (id) => {
     try {
       const token = await SecureStore.getItemAsync('authToken');
-      const response = await fetch(`http://192.168.1.52:8000/api/patients/${id}`, {
+      const response = await fetch(`http://172.20.10.2:8000/api/patients/${id}`, {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${token}`,

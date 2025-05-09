@@ -15,7 +15,7 @@ import * as SecureStore from 'expo-secure-store';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { Picker } from '@react-native-picker/picker';
 
-const BASE_URL = 'http://192.168.1.52:8000/api';
+const BASE_URL = 'http://172.20.10.2:8000/api';
 
 const ValiderArriverScreen = ({ route, navigation }) => {
   const { id } = route.params;

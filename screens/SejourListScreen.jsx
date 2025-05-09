@@ -19,7 +19,7 @@ import { debounce } from 'lodash';
 const { width, height } = Dimensions.get('window');
 
 // URL de base pour vos requêtes API
-const BASE_URL = 'http://192.168.1.52:8000/api';
+const BASE_URL = 'http://172.20.10.2:8000/api';
 
 const SejourListScreen = ({ navigation }) => {
   const [sejours, setSejours] = useState([]);

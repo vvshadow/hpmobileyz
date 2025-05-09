@@ -16,7 +16,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import { Picker } from '@react-native-picker/picker';
 import * as SecureStore from 'expo-secure-store';
 
-const BASE_URL = 'http://192.168.1.52:8000/api';
+const BASE_URL = 'http://172.20.10.2:8000/api';
 
 const AjouterSejourScreen = ({ navigation }) => {
   const [selectedPatient, setSelectedPatient] = useState(null);
