@@ -76,7 +76,7 @@ const UserListScreen = ({ navigation }) => {
         <Text style={styles.name}>{item.email}</Text>
         <Text style={styles.detail}>Rôles: {item.roles.join(', ')}</Text>
         <Text style={styles.detail}>
-          Vérifié: {item.isVerified ? 'Oui' : 'Non'}
+  
         </Text>
       </View>
 

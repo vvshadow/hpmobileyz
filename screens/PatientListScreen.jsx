@@ -179,15 +179,7 @@ const PatientListScreen = ({ navigation }) => {
               <Icon name="edit" size={20} color="#FFF" />
             </TouchableOpacity>
 
-            <TouchableOpacity
-              style={[styles.iconButton, styles.deleteButton]}
-              onPress={() => {
-                setSelectedPatient(item.id);
-                setDeleteVisible(true);
-              }}
-              activeOpacity={0.6}>
-              <Icon name="delete" size={20} color="#FFF" />
-            </TouchableOpacity>
+            
           </>
         )}
       </View>
