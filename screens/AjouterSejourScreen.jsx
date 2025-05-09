@@ -15,8 +15,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { Picker } from '@react-native-picker/picker';
 import * as SecureStore from 'expo-secure-store';
-
-const BASE_URL = 'http://172.20.10.2:8000/api';
+import { API_URL } from '@env';
 
 const AjouterSejourScreen = ({ navigation }) => {
   const [selectedPatient, setSelectedPatient] = useState(null);
@@ -59,14 +58,14 @@ const AjouterSejourScreen = ({ navigation }) => {
         }
 
         // Récupération des patients
-        const patientsResponse = await fetch(`${BASE_URL}/patients`, {
+        const patientsResponse = await fetch(`${API_URL}/patients`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const patientsData = await patientsResponse.json();
         setPatients(patientsData);
 
         // Récupération des services
-        const servicesResponse = await fetch(`${BASE_URL}/services`, {
+        const servicesResponse = await fetch(`${API_URL}/services`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const servicesData = await servicesResponse.json();
@@ -85,7 +84,7 @@ const AjouterSejourScreen = ({ navigation }) => {
       if (!selectedService) return;
       try {
         const token = await getAuthToken();
-        const chambresResponse = await fetch(`${BASE_URL}/services/${selectedService}/chambres`, {
+        const chambresResponse = await fetch(`${API_URL}/services/${selectedService}/chambres`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const chambresData = await chambresResponse.json();
@@ -104,7 +103,7 @@ const AjouterSejourScreen = ({ navigation }) => {
       if (!selectedChambre) return;
       try {
         const token = await getAuthToken();
-        const litsResponse = await fetch(`${BASE_URL}/chambres/${selectedChambre}/lits/disponibles`, {
+        const litsResponse = await fetch(`${API_URL}/chambres/${selectedChambre}/lits/disponibles`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const litsData = await litsResponse.json();
@@ -156,7 +155,7 @@ const AjouterSejourScreen = ({ navigation }) => {
         commentaire,
       };
 
-      const response = await fetch(`${BASE_URL}/sejours`, {
+      const response = await fetch(`${API_URL}/sejours`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

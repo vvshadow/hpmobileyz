@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { API_URL } from '@env';
 
 const PatientFormScreen = ({ navigation, route }) => {
   const { patient } = route.params || {};
@@ -40,8 +41,8 @@ const PatientFormScreen = ({ navigation, route }) => {
       if (!token) throw new Error('Authentification requise');
 
       const url = patient 
-        ? `http://172.20.10.2:8000/api/patients/${patient.id}`
-        : 'http://172.20.10.2:8000/api/patients';
+        ? `${API_URL}/patients/${patient.id}`
+        : `${API_URL}/patients`;
       
       const response = await fetch(url, {
         method: patient ? 'PUT' : 'POST',

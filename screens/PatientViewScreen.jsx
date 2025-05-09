@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { API_URL } from '@env';
 
 const PatientViewScreen = ({ navigation, route }) => {
   const [patient, setPatient] = useState(null);
@@ -23,7 +24,7 @@ const PatientViewScreen = ({ navigation, route }) => {
   const fetchPatient = async () => {
     try {
       const token = await SecureStore.getItemAsync('authToken');
-      const response = await fetch(`http://172.20.10.2:8000/api/patients/${id}`, {
+      const response = await fetch(`${API_URL}/patients/${id}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },

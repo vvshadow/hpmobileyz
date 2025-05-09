@@ -15,11 +15,9 @@ import {
 import * as SecureStore from 'expo-secure-store';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { debounce } from 'lodash';
+import { API_URL } from '@env';
 
 const { width, height } = Dimensions.get('window');
-
-// URL de base pour vos requêtes API
-const BASE_URL = 'http://172.20.10.2:8000/api';
 
 const SejourListScreen = ({ navigation }) => {
   const [sejours, setSejours] = useState([]);
@@ -47,7 +45,7 @@ const SejourListScreen = ({ navigation }) => {
         navigation.navigate('Login');
         return;
       }
-      const url = `${BASE_URL}/sejours`;
+      const url = `${API_URL}/sejours`;
       const response = await fetch(url, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -105,7 +103,7 @@ const SejourListScreen = ({ navigation }) => {
         navigation.navigate('Login');
         return;
       }
-      const response = await fetch(`${BASE_URL}/sejours/${id}`, {
+      const response = await fetch(`${API_URL}/sejours/${id}`, {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${token}`,

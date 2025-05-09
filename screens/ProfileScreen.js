@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { API_URL } from '@env';
 import Menu from '../components/Menu';
 
 const ProfileScreen = ({ navigation, setIsAuthenticated }) => {
@@ -27,7 +28,7 @@ const ProfileScreen = ({ navigation, setIsAuthenticated }) => {
         return;
       }
       
-      const response = await fetch('http://172.20.10.2:8000/api/profile', {
+      const response = await fetch(`${API_URL}/profile`, {
         method: 'GET',
         headers: {
           Authorization: `Bearer ${token}`,

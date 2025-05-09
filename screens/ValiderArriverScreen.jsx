@@ -14,8 +14,7 @@ import {
 import * as SecureStore from 'expo-secure-store';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { Picker } from '@react-native-picker/picker';
-
-const BASE_URL = 'http://172.20.10.2:8000/api';
+import { API_URL } from '@env';
 
 const ValiderArriverScreen = ({ route, navigation }) => {
   const { id } = route.params;
@@ -42,7 +41,7 @@ const ValiderArriverScreen = ({ route, navigation }) => {
         navigation.navigate('Login');
         return;
       }
-      const response = await fetch(`${BASE_URL}/sejours/${id}`, {
+      const response = await fetch(`${API_URL}/sejours/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -79,7 +78,7 @@ const ValiderArriverScreen = ({ route, navigation }) => {
         return;
       }
       
-      const response = await fetch(`${BASE_URL}/sejours/${id}`, {
+      const response = await fetch(`${API_URL}/sejours/${id}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/merge-patch+json',

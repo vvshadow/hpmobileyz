@@ -15,6 +15,7 @@ import {
 import * as SecureStore from 'expo-secure-store';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { debounce } from 'lodash';
+import { API_URL } from '@env';
 
 const { width, height } = Dimensions.get('window');
 
@@ -31,7 +32,7 @@ const PatientListScreen = ({ navigation }) => {
   const fetchPatients = async (query = '') => {
     try {
       const token = await SecureStore.getItemAsync('authToken');
-      const url = `http://172.20.10.2:8000/api/patients?search=${query}`;
+      const url = `${API_URL}/patients?search=${query}`;
       const response = await fetch(url, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -76,7 +77,7 @@ const PatientListScreen = ({ navigation }) => {
   const handleDelete = async (id) => {
     try {
       const token = await SecureStore.getItemAsync('authToken');
-      const response = await fetch(`http://172.20.10.2:8000/api/patients/${id}`, {
+      const response = await fetch(`${API_URL}/patients/${id}`, {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -136,15 +137,7 @@ const PatientListScreen = ({ navigation }) => {
           <Icon name="edit" size={20} color="#FFF" />
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={[styles.iconButton, styles.deleteButton]}
-          onPress={() => {
-            setSelectedPatient(item.id);
-            setDeleteVisible(true);
-          }}
-          activeOpacity={0.7}>
-          <Icon name="delete" size={20} color="#FFF" />
-        </TouchableOpacity>
+      
       </View>
     </View>
   );

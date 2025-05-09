@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { API_URL } from '@env';
 //import DateTimePicker from '@react-native-community/datetimepicker';
 
 const SejourFormScreen = ({ navigation, route }) => {
@@ -60,8 +61,8 @@ const SejourFormScreen = ({ navigation, route }) => {
     try {
       const token = await AsyncStorage.getItem('token');
       const url = sejour 
-        ? `http://172.20.10.2:8000/api/sejours/${sejour.id}`
-        : 'http://172.20.10.2:8000/api/sejours';
+        ? `${API_URL}/sejours/${sejour.id}`
+        : `${API_URL}/sejours`;
 
       const payload = {
         ...formData,
