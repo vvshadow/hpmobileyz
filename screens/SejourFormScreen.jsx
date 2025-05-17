@@ -13,7 +13,8 @@ import {
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { API_URL } from '@env';
+// URL de l'API fixe remplaçant la variable d'environnement
+const API_URL = 'http://192.168.1.155:8000/api';
 //import DateTimePicker from '@react-native-community/datetimepicker';
 
 const SejourFormScreen = ({ navigation, route }) => {

@@ -16,7 +16,8 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as SecureStore from 'expo-secure-store';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import { API_URL } from '@env';
+// URL de l'API fixe remplaçant la variable d'environnement
+const API_URL = 'http://192.168.1.155:8000/api';
 
 
 const LoginScreen = ({ navigation, setIsAuthenticated }) => {
@@ -48,6 +49,7 @@ const LoginScreen = ({ navigation, setIsAuthenticated }) => {
   };
 
   const handleLogin = async () => {
+    // Utilisation de l'URL fixe pour l'API
     if (!validateForm()) return;
 
     setIsLoading(true);

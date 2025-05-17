@@ -13,7 +13,8 @@ import {
 } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { API_URL } from '@env';
+// URL de l'API fixe remplaçant la variable d'environnement
+const API_URL = 'http://192.168.1.155:8000/api';
 
 const PatientFormScreen = ({ navigation, route }) => {
   const { patient } = route.params || {};
